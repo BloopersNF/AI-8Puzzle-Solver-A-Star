@@ -31,3 +31,22 @@ def play(state, block):
 
     return State(matrix=newM)
 
+def plays(state):
+    
+    adj = np.array([[0,1,0],[1,0,1],[0,1,0]])
+    blank = state.matrix==9
+    conv = conv2(adj, blank, 'same')
+
+    return state.matrix[np.where(conv)]
+
+matriz1 = State(matrix=np.array([[1,2,3],[4,5,6],[7,8,9]]))
+matriz2 = State(matrix=np.array([[1,2,3],[4,5,6],[7,9,8]]))
+
+print(matriz1.matrix == 3)
+print(matriz1.matrix == 0)
+print(matriz1.matrix == 9)
+
+matriz2.show()
+
+matriz2 = play(matriz2, 8)
+matriz2.show()
