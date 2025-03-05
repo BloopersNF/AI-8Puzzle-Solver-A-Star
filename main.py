@@ -1,6 +1,7 @@
 import numpy as np
 from queue import PriorityQueue
 from scipy.signal import convolve2d as conv2
+from time import perf_counter as counter
 from time import sleep
 
 class State:
@@ -39,21 +40,23 @@ def plays(state):
 
     return state.matrix[np.where(conv)]
 
-def AStar(state, goal, heuristic):
-
+def AStar(state, goal, heuristic,):
+    stateCount = 0
     cs = set()
 
     pq = PriorityQueue()
     state.f = 0
     state.parent = None
 
-    pq.put((state.f, state))
+    pq.put((state.f, heuristic(state), state))
 
     while pq is not pq.empty():
-        s = pq.get()[1]
+        
+        s = pq.get()[2]
+        stateCount = stateCount+1
 
         if s == goal:
-            return s
+            return s, stateCount
         
         if tuple(s.matrix.flatten()) in cs:
             continue
@@ -62,10 +65,11 @@ def AStar(state, goal, heuristic):
 
         for p in plays(s):
             ns = play(s, p)
+            print(ns.matrix)
             ns.g = s.g + 1
             ns.parent = s
             ns.f = ns.g + heuristic(ns)
-            pq.put((ns.f, ns))
+            pq.put((ns.f, heuristic(ns),ns))
     return state
 
 
@@ -75,7 +79,17 @@ def hamming(state):
         return max(out, 0)
 
 def manhattan(state):
-    return 0
+    dist = 0
+    goal = np.array([[1,2,3],[4,5,6],[7,8,9]])
+
+    for i in range(state.matrix.shape[0]):
+        for j in range(state.matrix.shape[1]):
+            block = state.matrix[i,j]
+            if block != 9:
+                gPos = np.argwhere(block == goal)[0]
+                dist += abs(i - gPos[0]) + abs(j - gPos[1])
+    return dist
+
 
 
 def reconstruct(state):
@@ -87,15 +101,28 @@ def reconstruct(state):
 goal = State(matrix=np.array([[1,2,3],[4,5,6],[7,8,9]]))
 matriz = State(matrix=np.array([[4,6,7],[9,5,8],[2,1,3]]))
 
-result = AStar(matriz, goal, hamming)
-
-print("matriz inicial:")
-print(matriz.matrix)
-print('Encontrando solução...')
-print()
-
-reconstruct(result)
+start = counter()
+result, stateCount = AStar(matriz, goal, hamming)
+end = counter()
 print(f'Objetivo encontrado em {result.g} movimentos')
+print(f'Foram testados {stateCount} Estados diferentes!')
+print(f'Objetivo encontrado em {abs(start - end)} segundos')
+input()
+
+stateCount = 0
+start = counter()
+result, stateCount = AStar(matriz, goal, manhattan)
+end = counter()
+print(f'Objetivo encontrado em {result.g} movimentos')
+print(f'Foram testados {stateCount} Estados diferentes!')
+print(f'Objetivo encontrado em {abs(start - end)} segundos')
+
+# print("matriz inicial:")
+# print(matriz.matrix)
+# print('Encontrando solução...')
+# print()
+# reconstruct(result)
+
 
 
 
