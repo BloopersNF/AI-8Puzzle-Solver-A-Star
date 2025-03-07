@@ -1,0 +1,7 @@
+Heuristic,Tie Breaker,Movements,States Explored,Time (s)
+Hamming,min_h,27,79947,21.28185780000058
+Hamming,min_g,27,113327,30.534101499972166
+Hamming,fifo,27,113322,21.945729199971538
+Manhattan,min_h,27,3190,2.4172634000133257
+Manhattan,min_g,27,9094,6.907734100008383
+Manhattan,fifo,27,8958,6.126796199998353
