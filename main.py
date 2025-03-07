@@ -2,7 +2,6 @@ import numpy as np
 from queue import PriorityQueue
 from scipy.signal import convolve2d as conv2
 from time import perf_counter as counter
-from time import sleep
 
 class State:
     def __init__(self, parent=None, matrix=None):
@@ -40,6 +39,17 @@ def plays(state):
 
     return state.matrix[np.where(conv)]
 
+def invCount(matrix):
+    arr = matrix.flatten()
+    arr = arr[arr != 9]
+
+    inv = 0
+    for i in range(len(arr)):
+        for j in range(i + 1, len(arr)):
+            if arr[i] > arr[j]:
+                inv += 1
+    return inv
+
 def AStar(state, goal, heuristic,):
     stateCount = 0
     cs = set()
@@ -57,6 +67,9 @@ def AStar(state, goal, heuristic,):
 
         if s == goal:
             return s, stateCount
+        
+        if (invCount(s.matrix) % 2) != 0:
+            raise ValueError("Matrix not solvable")
         
         if tuple(s.matrix.flatten()) in cs:
             continue
@@ -99,7 +112,7 @@ def reconstruct(state):
 
 
 goal = State(matrix=np.array([[1,2,3],[4,5,6],[7,8,9]]))
-matriz = State(matrix=np.array([[4,6,7],[9,5,8],[2,1,3]]))
+matriz = State(matrix=np.array([[1,2,3],[4,5,6],[7,8,9]]))
 
 start = counter()
 result, stateCount = AStar(matriz, goal, hamming)
@@ -117,11 +130,10 @@ print(f'Objetivo encontrado em {result.g} movimentos')
 print(f'Foram testados {stateCount} Estados diferentes!')
 print(f'Objetivo encontrado em {abs(start - end)} segundos')
 
-# print("matriz inicial:")
-# print(matriz.matrix)
-# print('Encontrando solução...')
-# print()
-# reconstruct(result)
+print("matriz inicial:")
+print(matriz.matrix)
+print()
+reconstruct(result)
 
 
 
